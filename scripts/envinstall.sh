@@ -11,6 +11,13 @@ GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 NC='\033[0m'
 
+# Check already existing virtual environment
+if [ -d ${VENV_DIR} ]; then
+    printf "${YELLOW}${VENV_DIR} already exists."
+    printf "if this is not a mistake, remove the directory first${NC}\n"
+    exit 1
+fi
+
 # Check Python version
 printf "${GREEN}Checking Python ${PY_VERSION} version requirements ...${NC}\n"
 if ! command -v python${PY_VERSION} >/dev/null 2>&1; then
@@ -33,11 +40,12 @@ fi
 printf "${GREEN}Python virtual environment created at ${VENV_DIR}${NC}\n"
 
 # Install requirements
-if ! ${VENV_DIR}/bin/pip install -r requirements.txt; then
+if ! ${VENV_DIR}/bin/pip install -e .; then
     printf "${RED}Failed to install requirements${NC}\n"
     printf "${YELLOW}Consider a manual installation of all dependencies\n"
     printf "\trun: source ${VENV_DIR}/bin/activate\n"
     printf "\trun: pip install <PACKAGE_NAME>==<VERSION>\n"
+    printf "See pyproject.toml\n"
     printf "Or delete ${VENV_DIR}$ with rm -r ${VENV_DIR}${NC}\n"
     exit 1
 fi

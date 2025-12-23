@@ -3,7 +3,7 @@ name = "raise-your-sign"
 version = "0.1"
 dependencies = [
     "opencv-python>=4.12",
-    "pandas>=0.3",
+    "pandas>=2.3",
     "matplotlib>=3.10"  
 ]
 requires-python = ">= 3.13"
@@ -20,7 +20,6 @@ classifiers = [
     "Development Status :: 1 - Planning",
     "Intended Audience :: Education",
     "Topic :: Games/Entertainment",
-    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
     "Operating System :: OS Independent"
@@ -29,3 +28,9 @@ classifiers = [
 [project.urls]
 Homepage = "https://github.com/chxadr/raise-your-sign"
 Repository = "https://github.com/chxadr/raise-your-sign"
+
+[build-system]
+# These are the assumed default build requirements from pip:
+# https://pip.pypa.io/en/stable/reference/pip/#pep-517-and-518-support
+requires = ["setuptools>=43.0.0", "wheel"]
+build-backend = "setuptools.build_meta"

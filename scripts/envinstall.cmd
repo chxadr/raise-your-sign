@@ -7,6 +7,12 @@ setlocal enabledelayedexpansion
 set "VENV_DIR=.venv"
 set "PY_VERSION=3.13"
 
+if exist "%VENV_DIR%" (
+   echo %VENV_DIR% already exists
+   echo if this is not a mistake, remove the directory first
+   exit /b 1
+)
+
 echo Checking Python %PY_VERSION% version requirements ...
 
 :: Check Python version
@@ -36,12 +42,13 @@ if %ERRORLEVEL% neq 0 (
 echo Python virtual environment created at %VENV_DIR%%NC%
 
 :: Install requirements
-%VENV_DIR%\Scripts\pip install -r requirements.txt
+%VENV_DIR%\Scripts\pip install -e .
 if %ERRORLEVEL% neq 0 (
     echo Failed to install requirements
     echo Consider a manual installation of all dependencies
     echo     run: %VENV_DIR%\Scripts\activate
     echo     run: pip install ^<PACKAGE_NAME^>==^<VERSION^>
+    echo See pyproject.toml
     echo Or delete %VENV_DIR% with rmdir /s /q %VENV_DIR%
     exit /b 1
 )

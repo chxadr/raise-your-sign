@@ -1,0 +1,31 @@
+[project]
+name = "raise-your-sign"
+version = "0.1"
+dependencies = [
+    "opencv-python>=4.12",
+    "pandas>=0.3",
+    "matplotlib>=3.10"  
+]
+requires-python = ">= 3.13"
+authors = [
+    {name = "Julia Cabarbaye", email = "julia.cabarbaye@etu.unilim.fr"},
+    {name = "Adrien Chevrier", email = "adrien.chevrier@etu.unilim.fr"}
+]
+description = "An interactive quiz program relying on image processing."
+readme = "README.md"
+license = "AGPL-3.0-or-later"
+license-files = ["LICENSE"]
+keywords = ["computer-vision", "image-processing", "quiz", "interactive"]
+classifiers = [
+    "Development Status :: 1 - Planning",
+    "Intended Audience :: Education",
+    "Topic :: Games/Entertainment",
+    "License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)",
+    "Programming Language :: Python :: 3"
+    "Programming Language :: Python :: 3.13",
+    "Operating System :: OS Independent"
+]
+
+[project.urls]
+Homepage = "https://github.com/chxadr/raise-your-sign"
+Repository = "https://github.com/chxadr/raise-your-sign"

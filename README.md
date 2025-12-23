@@ -16,25 +16,28 @@ Next, you need to install the project setup.
 
 - **On UNIX-like systems:**
 
-Simply run the following command in your terminal:
+  Simply run the following command in your terminal:
 
-```sh
-make install
-```
+  ```sh
+  make install
+  ```
 
-This will install the necessary dependencies. Make sure you have **Python 3.13** installed before running this command.
+  This will install the necessary dependencies. Make sure you have **Python 3.13**
+  installed before running this command.
 
 - **On Windows:**
 
-You can use the [Python Install Manager](https://www.python.org/downloads/windows/) to install Python 3.13 and manage your Python environments. It’s a really handy tool!
+  You can use the [Python Install Manager](https://www.python.org/downloads/windows/)
+  to install Python 3.13 and manage your Python environments. It’s a really handy tool!
 
-Run the provided script from **Command Prompt** (not PowerShell, as it may not work):
+  Run the provided script from **Command Prompt** (not PowerShell, as it may not work):
 
-```cmd
-scripts\envinstall.cmd
-```
+  ```cmd
+  scripts\envinstall.cmd
+  ```
 
-This will install Pyhton 3.13 (if you have the Python Install Manager installed) and provide the necessary dependencies.
+  This will install Pyhton 3.13 (if you have the Python Install Manager installed)
+  and provide the necessary dependencies.
 
 ### Cleaning files
 
@@ -42,19 +45,19 @@ Sometimes when you add or remove features in the project, it's important to clea
 
 - **On UNIX-like systems:**
 
-You can clean up the cache and other generated files by running:
+  You can clean up the cache and other generated files by running:
 
-```sh
-make clean
-```
+  ```sh
+  make clean
+  ```
 
 - **On Windows:**
 
-Use the provided script to clean up:
+  Use the provided script to clean up:
 
-```cmd
-scripts\clean.cmd
-```
+  ```cmd
+  scripts\clean.cmd
+  ```
 
 ### Test your code
 

@@ -5,9 +5,9 @@ from abc import ABC, abstractmethod
 
 class QuizModel(ABC):
 
-    def __init__(self, quiz_file: str, player_names: list[str]):
+    def __init__(self, player_names: list[str]):
         self.listeners: list[QuizListener] = []
-        self.quiz_file: str = quiz_file
+        self.quiz_file: str | None = None
         self.player_names = player_names
 
     def notify_listeners(self, e: QuizEvent, arg: str | None = None) -> None:
@@ -30,6 +30,9 @@ class QuizModel(ABC):
 
     def inform_player(self, args: list[str]) -> None:
         self.notify_listeners(QuizEvent.INFO, args)
+
+    def set_quiz_file(self, path: str) -> None:
+        self.quiz_file = path
 
     @abstractmethod
     def get_player_name(self) -> str:

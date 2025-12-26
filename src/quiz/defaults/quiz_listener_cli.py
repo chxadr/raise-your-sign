@@ -37,7 +37,6 @@ class QuizListenerCLI(QuizListener):
                 if args is not None:
                     self.clear()
                     self.print_question_string()
-                    print(f"Answer for {args[0]}: ")
 
             case QuizEvent.INFO:
                 if args is not None:

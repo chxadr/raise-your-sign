@@ -4,6 +4,8 @@ from quiz.core.quiz_event import QuizEvent
 from typing import override
 import tkinter as tk
 from tkinter import ttk
+from tkinter import messagebox
+from tkinter import filedialog as fd
 
 
 class QuizControllerGUI(QuizController):
@@ -45,10 +47,23 @@ class QuizControllerGUI(QuizController):
                 btn.pack(side="left", padx=6)
                 self.radio_btns.append(btn)
 
+    def select_file(self):
+        messagebox.showinfo(
+            message="Select a quiz file"
+        )
+        filetypes = [("JSON Line", "*.jsonl")]
+        filename = fd.askopenfilename(
+            title="Open a file",
+            initialdir="./",
+            filetypes=filetypes
+        )
+        self.quiz.set_quiz_file(filename)
+
     def on_next_btn(self) -> None:
         match self.current_state:
 
             case QuizEvent.BEGIN:
+                self.select_file()
                 if self.quiz.next_question() and self.quiz.ask_next_player():
                     self.create_radio_buttons()
                     self.radio_frame.pack(expand=True, fill="both")

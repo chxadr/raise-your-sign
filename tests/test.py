@@ -4,7 +4,7 @@ import tkinter as tk
 
 
 def main():
-    quiz = qd.Quiz("quiz_data.jsonl", ["Julia", "Adrien"])
+    quiz = qd.Quiz(["Julia", "Adrien"])
     controller: qc.QuizController | None = None
     view: qc.QuizListener | None = None
     style = int(input("(1) CLI\t(2) GUI (TKinter): "))

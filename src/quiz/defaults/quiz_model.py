@@ -10,13 +10,13 @@ import datetime
 class Quiz(QuizModel):
 
     @staticmethod
-    def load_jsonl_line(path: str, index: int) -> dict[str, list[str], str]:
+    def load_jsonl_line(path: str | None, index: int) -> dict[str, list[str], str]:
         fallback = {
             "question": "",
             "options": [""],
             "correct_answer": ""
         }
-        if index < 0:
+        if index < 0 or path is None:
             return fallback
         try:
             with open(path, "r", encoding="utf-8") as f:
@@ -27,8 +27,8 @@ class Quiz(QuizModel):
         except Exception:
             return fallback
 
-    def __init__(self, quiz_file: str, player_names: list[str]):
-        super().__init__(quiz_file, player_names)
+    def __init__(self, player_names: list[str]):
+        super().__init__(player_names)
         self.player_index = -1
         self.line_index = -1
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")

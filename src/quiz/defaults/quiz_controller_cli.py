@@ -1,5 +1,6 @@
 from quiz.core.quiz_controller import QuizController
 from typing import override
+import os
 
 
 continue_str = "\nPress ENTER to continue"
@@ -15,7 +16,18 @@ class QuizControllerCLI(QuizController):
     def run_quiz(self):
         """Run the quiz."""
         self.quiz.begin()
-        self.wait_player()
+        while True:
+            self.quiz.inform_player(["Specify a quiz file (.jsonl): "])
+            path = input()
+            if os.path.isfile(path) \
+                    and os.access(path, os.R_OK) \
+                    and path.endswith('.jsonl'):
+                self.quiz.set_quiz_file(path)
+                self.wait_player()
+                break
+            else:
+                self.quiz.inform_player(["Invalid path or file format"])
+                continue
 
         while self.quiz.next_question():
             n_opts = len(self.quiz.get_options())

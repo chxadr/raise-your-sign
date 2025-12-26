@@ -21,7 +21,7 @@ class QuizListenerCLI(QuizListener):
         print("\033[H\033[2J")
 
     @override
-    def on_event(self, e: QuizEvent, args: list[str] | None = None):
+    def on_event(self, e: QuizEvent, args: list[str] | None = None) -> None:
         """React to quiz events."""
         match e:
 
@@ -38,7 +38,6 @@ class QuizListenerCLI(QuizListener):
                     self.clear()
                     self.print_question_string()
                     print(f"Answer for {args[0]}: ")
-                pass
 
             case QuizEvent.INFO:
                 if args is not None:

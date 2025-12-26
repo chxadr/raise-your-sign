@@ -1,18 +1,13 @@
-from quiz.defaults import Quiz, QuizControllerTUI, QuizViewTUI
+from quiz.defaults import Quiz, QuizControllerCLI, QuizListenerCLI
 
 
 def main():
-    # Initialize the model with the quiz file
-    quiz = Quiz("quiz_data.json")
+    quiz = Quiz("quiz_data.jsonl", ["Julia", "Adrien"])
+    view = QuizListenerCLI()
+    quiz.add_listener(view)
+    controller = QuizControllerCLI(quiz)
 
-    # Initialize the view
-    view = QuizViewTUI()
-
-    # Initialize the controller
-    controller = QuizControllerTUI(quiz, view)
-
-    # Start the quiz
-    controller.start_quiz()
+    controller.run_quiz()
 
 
 if __name__ == "__main__":

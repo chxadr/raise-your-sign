@@ -1,8 +1,13 @@
+from quiz.core.quiz_model import QuizModel
 from abc import ABC, abstractmethod
 
 
-class QuizControllerInterface(ABC):
+class QuizController(ABC):
+
+    def __init__(self, quiz: QuizModel):
+        self.quiz = quiz
+
     @abstractmethod
-    def start_quiz(self):
-        """Start the quiz and handle user input."""
+    def run_quiz(self):
+        """Run the quiz."""
         pass

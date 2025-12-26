@@ -1,3 +1,4 @@
-from .quiz_controller import QuizControllerInterface
-from .quiz_model import QuizModelInterface
-from .quiz_view import QuizViewInterface
+from .quiz_controller import *
+from .quiz_model import *
+from .quiz_listener import *
+from .quiz_event import *

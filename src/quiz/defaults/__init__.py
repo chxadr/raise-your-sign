@@ -1,3 +1,3 @@
-from .quiz_controller_tui import QuizControllerTUI
-from .quiz_model import Quiz
-from .quiz_view_tui import QuizViewTUI
+from .quiz_controller_cli import *
+from .quiz_model import *
+from .quiz_listener_cli import *

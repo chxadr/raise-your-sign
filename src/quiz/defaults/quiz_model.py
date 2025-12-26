@@ -1,51 +1,95 @@
-from quiz.core import QuizModelInterface
-
+from quiz.core.quiz_model import QuizModel
+from quiz.core.quiz_event import QuizEvent
+from typing import override
 import json
 import pandas as pd
+import os
+import datetime
 
 
-class Quiz(QuizModelInterface):
-    def __init__(self, quiz_file):
-        self.quiz_file = quiz_file
-        self.questions = []
-        self.load_quiz_data()
-        self.answers = {"Player 1": [], "Player 2": []}
+class Quiz(QuizModel):
 
-    def load_quiz_data(self):
-        """Load quiz data from a JSON file."""
+    @staticmethod
+    def load_jsonl_line(path: str, index: int) -> dict[str, list[str], str]:
+        fallback = {
+            "question": "",
+            "options": [""],
+            "correct_answer": ""
+        }
+        if index < 0:
+            return fallback
         try:
-            with open(self.quiz_file, 'r') as file:
-                self.questions = json.load(file)
-        except FileNotFoundError:
-            print(f"Error: The file {self.quiz_file} does not exist.")
+            with open(path, "r", encoding="utf-8") as f:
+                for i, line in enumerate(f):
+                    if i == index:
+                        return json.loads(line)
+                return fallback
+        except Exception:
+            return fallback
 
-    def get_question(self, index):
-        """Return the question at a specific index."""
-        return self.questions[index]
+    def __init__(self, quiz_file: str, player_names: list[str]):
+        super().__init__(quiz_file, player_names)
+        self.player_index = -1
+        self.line_index = -1
+        timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+        self.output_file = f"{timestamp}-quiz_results.csv"
 
-    def record_answer(self, player, question_index, answer):
-        """Record the answer for a specific player and question."""
-        if player in self.answers:
-            self.answers[player].append({
-                "Question": self.questions[question_index]["question"],
-                "Answer": answer
-            })
+    @override
+    def get_question(self) -> str:
+        return self.line["question"]
 
-    def save_answers_to_csv(self, output_file):
-        """Save the answers to a CSV file using pandas."""
-        # Flatten the answers into a format suitable for a dataframe
-        data = []
-        for player, answers in self.answers.items():
-            for answer in answers:
-                data.append({
-                    "Player": player,
-                    "Question": answer["Question"],
-                    "Answer": answer["Answer"]
-                })
+    @override
+    def get_options(self) -> list[str]:
+        return self.line["options"]
 
-        # Create a DataFrame
-        df = pd.DataFrame(data)
+    @override
+    def get_player_name(self) -> str:
+        try:
+            return self.player_names[self.player_index]
+        except IndexError:
+            return ""
 
-        # Save the DataFrame to a CSV file
-        df.to_csv(output_file, index=False)
-        print(f"Results saved to {output_file}")
+    @override
+    def record_answer(self, answer_index: int) -> None:
+        n_opts = len(self.line["options"])
+        if 0 <= answer_index < n_opts:
+            question = self.get_question()
+            answer = self.get_options()[answer_index]
+            correct_answer = self.line["correct_answer"]
+            data = [{
+                "player": self.player_names[self.player_index],
+                "question": question,
+                "answer": answer,
+                "result": str(answer == correct_answer)
+            }]
+            df = pd.DataFrame(data)
+            df.to_csv(
+                self.output_file,
+                mode='a',
+                index=False,
+                header=not os.path.exists(self.output_file)
+            )
+
+    @override
+    def next_question(self) -> bool:
+        self.player_index = -1
+        self.line_index += 1
+        self.line = self.load_jsonl_line(self.quiz_file, self.line_index)
+        if self.get_question() == "":
+            return False
+        self.notify_listeners(
+            QuizEvent.QUESTION,
+            [self.get_question()] + self.get_options()
+        )
+        return True
+
+    @override
+    def ask_next_player(self) -> bool:
+        self.player_index += 1
+        if self.get_player_name() == "":
+            return False
+        self.notify_listeners(
+           QuizEvent.ASK_PLAYER,
+           [self.get_player_name()]
+        )
+        return True

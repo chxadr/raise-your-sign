@@ -51,4 +51,4 @@ class QuizControllerCLI(QuizController):
 
         self.wait_player()
 
-        self.quiz.end()
+        self.quiz.end([self.quiz.output_file])

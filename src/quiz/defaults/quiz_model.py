@@ -10,7 +10,8 @@ import datetime
 class Quiz(QuizModel):
 
     @staticmethod
-    def load_jsonl_line(path: str | None, index: int) -> dict[str, list[str], str]:
+    def load_jsonl_line(path: str | None,
+                        index: int) -> dict[str, list[str], str]:
         fallback = {
             "question": "",
             "options": [""],
@@ -60,6 +61,7 @@ class Quiz(QuizModel):
                 "player": self.player_names[self.player_index],
                 "question": question,
                 "answer": answer,
+                "expected": correct_answer,
                 "result": str(answer == correct_answer)
             }]
             df = pd.DataFrame(data)

@@ -8,6 +8,7 @@ class QuizModel(ABC):
     def __init__(self, player_names: list[str]):
         self.listeners: list[QuizListener] = []
         self.quiz_file: str | None = None
+        self.output_file: str | None = None
         self.player_names = player_names
 
     def notify_listeners(self, e: QuizEvent, arg: str | None = None) -> None:
@@ -25,8 +26,8 @@ class QuizModel(ABC):
     def begin(self) -> None:
         self.notify_listeners(QuizEvent.BEGIN)
 
-    def end(self) -> None:
-        self.notify_listeners(QuizEvent.END)
+    def end(self, args: list[str] | None = None) -> None:
+        self.notify_listeners(QuizEvent.END, args)
 
     def inform_player(self, args: list[str]) -> None:
         self.notify_listeners(QuizEvent.INFO, args)

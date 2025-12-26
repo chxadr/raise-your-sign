@@ -85,7 +85,7 @@ class QuizControllerGUI(QuizController):
                     if not self.quiz.ask_next_player():
                         if not self.quiz.next_question():
                             self.interactive_frame.destroy()
-                            self.quiz.end()
+                            self.quiz.end([self.quiz.output_file])
                         else:
                             self.quiz.ask_next_player()
                             self.create_radio_buttons()

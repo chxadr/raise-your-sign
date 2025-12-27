@@ -1,10 +1,11 @@
 from quiz.core.quiz_model import QuizModel
 from quiz.core.quiz_controller import QuizController
 from quiz.core.quiz_event import QuizEvent
+
 from typing import override
+
 import tkinter as tk
 from tkinter import ttk
-from tkinter import messagebox
 from tkinter import filedialog as fd
 
 
@@ -47,23 +48,33 @@ class QuizControllerGUI(QuizController):
                 btn.pack(side="left", padx=6)
                 self.radio_btns.append(btn)
 
-    def select_file(self):
-        messagebox.showinfo(
-            message="Select a quiz file"
-        )
+    def select_file(self) -> str | tuple[str]:
+        self.quiz.inform_player(["Select a quiz file (.jsonl)"])
         filetypes = [("JSON Line", "*.jsonl")]
         filename = fd.askopenfilename(
             title="Open a file",
             initialdir="./",
             filetypes=filetypes
         )
-        self.quiz.set_quiz_file(filename)
+        return filename
 
     def on_next_btn(self) -> None:
         match self.current_state:
 
             case QuizEvent.BEGIN:
-                self.select_file()
+
+                quiz_file = self.select_file()
+                if isinstance(quiz_file, str):
+                    if quiz_file.endswith(".jsonl"):
+                        self.quiz.set_quiz_file(quiz_file)
+                    elif quiz_file == "":
+                        return
+                    else:
+                        self.quiz.inform_player(["Invalid file type"])
+                        return
+                else:
+                    return
+
                 if self.quiz.next_question() and self.quiz.ask_next_player():
                     self.create_radio_buttons()
                     self.radio_frame.pack(expand=True, fill="both")
@@ -73,6 +84,7 @@ class QuizControllerGUI(QuizController):
                     self.quiz.end()
 
             case QuizEvent.ASK_PLAYER:
+
                 answer_index = self.selected_index.get()
                 if answer_index < 0:
                     self.quiz.inform_player([

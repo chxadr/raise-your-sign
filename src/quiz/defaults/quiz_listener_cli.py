@@ -1,6 +1,8 @@
 from quiz.core.quiz_listener import QuizListener
 from quiz.core.quiz_event import QuizEvent
+
 from typing import override
+
 import pandas as pd
 from tabulate import tabulate
 import plotext as plt

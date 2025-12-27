@@ -3,13 +3,13 @@ from typing import override
 import os
 
 
-continue_str = "\nPress ENTER to continue"
+CONTINUE_STR = "\nPress ENTER to continue"
 
 
 class QuizControllerCLI(QuizController):
 
     def wait_player(self):
-        self.quiz.inform_player([continue_str])
+        self.quiz.inform_player([CONTINUE_STR])
         input()
 
     @override
@@ -30,29 +30,30 @@ class QuizControllerCLI(QuizController):
                     self.quiz.inform_player(["Invalid path or file format"])
                     continue
 
-                while self.quiz.next_question():
-                    n_opts = len(self.quiz.get_options())
+            while self.quiz.next_question():
+                n_opts = len(self.quiz.get_options())
 
-                    while self.quiz.ask_next_player():
-                        player = self.quiz.get_player_name()
+                while self.quiz.ask_next_player():
+                    player = self.quiz.get_player_name()
 
-                        while True:
-                            self.quiz.inform_player([
-                                f"{player}, enter your answer digit:"
-                            ])
-                            answer = input()
-                            if answer.isdigit() and 1 <= int(answer) <= n_opts:
-                                answer_index = int(answer) - 1
-                                self.quiz.record_answer(answer_index)
-                                break
-                            self.quiz.inform_player([
-                                f"Input a digit within the range 1-{n_opts}"
-                            ])
-                            continue
+                    while True:
+                        self.quiz.inform_player([
+                            f"{player}, enter your answer digit:"
+                        ])
+                        answer = input()
+                        if answer.isdigit() and 1 <= int(answer) <= n_opts:
+                            answer_index = int(answer) - 1
+                            self.quiz.record_answer(answer_index)
+                            break
+                        self.quiz.inform_player([
+                            f"Input a digit within the range 1-{n_opts}"
+                        ])
+                        continue
 
-                        self.wait_player()
+                    self.wait_player()
 
-                        self.quiz.end([self.quiz.output_file])
+            self.quiz.end([self.quiz.output_file])
+            self.wait_player()
 
         except KeyboardInterrupt:
             return

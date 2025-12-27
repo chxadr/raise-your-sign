@@ -7,6 +7,7 @@ def main():
     quiz = qd.Quiz(["Julia", "Adrien"])
     controller: qc.QuizController | None = None
     view: qc.QuizListener | None = None
+    sounds = qd.SoundPlayer()
     style = int(input("(1) CLI\t(2) GUI (TKinter): "))
 
     if style == 1:
@@ -17,7 +18,7 @@ def main():
         view = qd.QuizListenerGUI(root)
         controller = qd.QuizControllerGUI(quiz, view)
 
-    quiz.add_listener(view)
+    quiz.add_listener([view, sounds])
     controller.run_quiz()
 
 

@@ -1,3 +1,10 @@
+"""Command-line interface (CLI) quiz event listener.
+
+This module provides a concrete implementation of a quiz event listener
+that displays questions and players in the terminal. It also
+generates simple textual and graphical summaries of quiz results.
+"""
+
 from quiz.core.quiz_listener import QuizListener
 from quiz.core.quiz_event import QuizEvent
 
@@ -9,23 +16,49 @@ import plotext as plt
 
 
 class QuizListenerCLI(QuizListener):
+    """CLI-based quiz listener for displaying questions and results.
+
+    This listener reacts to quiz events by printing questions, prompting
+    players and showing results using tables and terminal plots.
+
+    Attributes:
+        question_string: A formatted string representing the current question
+            and its answer options for display.
+    """
 
     def __init__(self):
+        """Initialize the CLI listener."""
         self.question_string = ""
 
     def build_question_string(self, args: list[str]) -> None:
+        """Build a formatted string for the current question and its options.
+
+        Args:
+            args: List containing the question as the first element and
+                subsequent elements as answer options.
+        """
         self.question_string = f"Question: {args[0]}"
         if len(args) > 1:
             for i, option in enumerate(args[1:]):
                 self.question_string += f"\n{i+1}. {option}"
 
     def print_question_string(self):
+        """Print the currently built question string."""
         print(self.question_string)
 
     def clear(self) -> None:
+        """Clear the terminal screen using ANSI escape sequences."""
         print("\033[H\033[2J")
 
-    def print_results_table(self, path: str):
+    def print_results_table(self, path: str) -> None:
+        """Print a table of quiz results from a CSV file.
+
+        Print a table of quiz results from a CSV file
+        using the `tabulate` module.
+
+        Args:
+            path: Path to the CSV file containing quiz results.
+        """
         print(tabulate(
             pd.read_csv(path),
             headers="keys",
@@ -33,7 +66,17 @@ class QuizListenerCLI(QuizListener):
             showindex=False
         ))
 
-    def print_results_plots(self, path: str):
+    def print_results_plots(self, path: str) -> None:
+        """Print simple terminal bar plots for scores, accuracy, and
+        per-question results.
+
+        Print simple terminal bar plots for scores, accuracy, and
+        per-question results using the `plotext` module. The file
+        is loaded with the `pandas` module.
+
+        Args:
+            path: Path to the CSV file containing quiz results.
+        """
         df = pd.read_csv(path)
         scores = df.groupby("player")["result"].sum()
         plt.simple_bar(
@@ -65,7 +108,6 @@ class QuizListenerCLI(QuizListener):
 
     @override
     def on_event(self, e: QuizEvent, args: list[str] | None = None) -> None:
-        """React to quiz events."""
         match e:
 
             case QuizEvent.BEGIN:
@@ -74,6 +116,7 @@ class QuizListenerCLI(QuizListener):
 
             case QuizEvent.QUESTION:
                 if args is not None:
+                    # Process `args` as `["Question", "Opt1", ... ,"OptN"]`.
                     self.build_question_string(args)
 
             case QuizEvent.ASK_PLAYER:
@@ -90,5 +133,6 @@ class QuizListenerCLI(QuizListener):
                 self.clear()
                 print("The quiz is over. Thanks!")
                 if args is not None:
+                    # Only process `args[0]` as a filename.
                     self.print_results_table(args[0])
                     self.print_results_plots(args[0])

@@ -1,7 +1,16 @@
+"""Graphical user interface (GUI) quiz event listener.
+
+This module provides a concrete implementation of a quiz event listener
+using `tkinter` for GUI display and `matplotlib` for plotting results.
+It reacts to quiz events by updating labels, prompting players and
+showing visual summaries of scores and accuracy.
+"""
+
 from quiz.core.quiz_listener import QuizListener
 from quiz.core.quiz_event import QuizEvent
 
-from typing import override
+from typing import override, Any
+import sys
 
 import tkinter as tk
 from tkinter import ttk
@@ -16,12 +25,32 @@ import pandas as pd
 
 
 class QuizListenerGUI(ttk.Frame, QuizListener):
+    """GUI-based quiz listener for displaying questions, players and results.
+
+    Attributes:
+        master: The parent `tkinter` frame.
+        selected_index: `tkinter` variable tracking selected option index.
+        question_string: Formatted string of the current question and options.
+        question_label: Label widget displaying the question text.
+        player_frame: Frame containing player-related widgets.
+        player_label: Label displaying the current player's name.
+        canvas: `matplotlib` canvas used for plotting results
+            (initialized during plots).
+        plot_window: Toplevel window for displaying result plots.
+    """
 
     def __init__(self, master: ttk.Frame):
+        """Initialize the GUI listener and configure the main window.
+
+        Args:
+            master: The parent `tkinter` frame.
+        """
         super().__init__(master, padding=20)
         self.master = master
         self.master.wm_title("Quiz")
         self.master.minsize(700, 300)
+
+        # Allows good integration with tiled window managers on UNIX systems.
         self.master.attributes('-type', 'dialog')
         self.master.protocol("WM_DELETE_WINDOW", self.destroy_all)
 
@@ -38,12 +67,26 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
         self.player_label.pack(side="left", fill="y")
 
     def build_question_string(self, args: list[str]) -> None:
+        """Format the current question and its options for display.
+
+        Args:
+            args: List containing the question as the first element and
+                subsequent elements as answer options.
+        """
         self.question_string = f"Question: {args[0]}"
         if len(args) > 1:
             for i, option in enumerate(args[1:]):
                 self.question_string += f"\n{i+1}. {option}"
 
-    def wrap_labels(self, ax, width, break_long_words=False):
+    def wrap_labels(self, ax: Any, width: int,
+                    break_long_words: bool = False) -> None:
+        """Wrap y-axis labels for `matplotlib` plots to a given width.
+
+        Args:
+            ax: The `matplotlib` axes object.
+            width: Maximum character width before wrapping.
+            break_long_words: Whether to break long words if needed.
+        """
         labels = [label.get_text() for label in ax.get_yticklabels()]
 
         wrapped_labels = [
@@ -54,10 +97,20 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
         ax.set_yticks(ax.get_yticks())
         ax.set_yticklabels(wrapped_labels)
 
-    def display_results_plots(self, path: str):
+    def display_results_plots(self, path: str) -> None:
+        """Display bar plots for scores, accuracy and question results.
+
+        Display bar plots for scores, accuracy and question results using
+        `matplotlib` inside a separate `tkinter`window.
+        The CSV file is loaded with `pandas`.
+
+        Args:
+            path: Path to the CSV file containing quiz results.
+        """
         try:
             df = pd.read_csv(path)
-        except Exception:
+        except Exception as e:
+            print(e, file=sys.stderr)
             return
         scores = df.groupby("player")["result"].sum()
         accuracy = df.groupby("player")["result"].mean() * 100
@@ -92,13 +145,21 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
         quit_button.pack(side="bottom", pady=10)
         self.canvas.get_tk_widget().pack(expand=True, fill="both")
 
-    def destroy_all(self):
+    def destroy_all(self) -> None:
+        """Quit and destroy the main GUI window."""
+        #
+        # Calling the `quit()` method on the master's `tkinter` window breaks
+        # the main loop and force to garbage collect any `tkinter` resources.
+        # Without it, closing the main window may leave the program running
+        # in the background due to interactions with `matplotlib`.
+        # This might be an issue related to the code quality.
+        #
+        # TODO: replace `quit()` with a production-friendly alternative.
         self.master.quit()
         self.master.destroy()
 
     @override
     def on_event(self, e: QuizEvent, args: list[str] | None = None) -> None:
-        """React to quiz events."""
         match e:
 
             case QuizEvent.BEGIN:
@@ -107,15 +168,18 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
 
             case QuizEvent.QUESTION:
                 if args is not None:
+                    # Process `args` as `["Question", "Opt1", ... ,"OptN"]`.
                     self.build_question_string(args)
                     self.question_label.config(text=self.question_string)
 
             case QuizEvent.ASK_PLAYER:
                 if args is not None:
+                    # Process `args[0]` as a player's name.
                     self.player_label.config(text=f"Answer for {args[0]}")
 
             case QuizEvent.INFO:
                 if args is not None:
+                    # Process `args` as a list of strings.
                     messagebox.showinfo(
                         message="".join([arg + "\n" for arg in args])
                     )
@@ -130,4 +194,5 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
                 )
                 quit_button.pack(pady=10)
                 if args is not None:
+                    # Process `args[0]` as a filename.
                     self.display_results_plots(args[0])

@@ -1,0 +1,5 @@
+player,question,answer,expected,result
+Julia,Is Python a programming language?,No,Yes,False
+Adrien,Is Python a programming language?,No,Yes,False
+Julia,Which of these is not a programming language?,HTML,HTML,True
+Adrien,Which of these is not a programming language?,HTML,HTML,True

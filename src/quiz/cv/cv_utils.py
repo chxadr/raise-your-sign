@@ -1,0 +1,181 @@
+import cv2
+import numpy as np
+from dataclasses import dataclass
+from typing import Any
+
+
+@dataclass(frozen=True)
+class MaskConfig:
+    # Gaussian blur
+    gaussian_kernel_size: tuple = (5, 5)
+    gaussian_sigma: float = 0.0
+
+    # Sobel operator
+    sobel_ddepth: int = cv2.CV_32F
+
+    # Gradient thresholding
+    edge_threshold: int = 50
+    max_binary_value: int = 255
+
+    # Morphological closing
+    morph_kernel_size: tuple = (7, 7)
+    morph_operation: int = cv2.MORPH_CLOSE
+
+    # Contour filtering
+    min_contour_area: int = 5000
+
+
+@dataclass(frozen=True)
+class ColorRange:
+    lower: np.ndarray
+    upper: np.ndarray
+
+
+@dataclass(frozen=True)
+class ColorDetectionConfig:
+    # HSV color ranges
+    red1: ColorRange = ColorRange(
+        np.array([0, 170, 100]), np.array([10, 255, 255])
+    )
+    red2: ColorRange = ColorRange(
+        np.array([170, 170, 100]), np.array([180, 255, 255])
+    )
+    yellow: ColorRange = ColorRange(
+        np.array([15, 150, 150]), np.array([32, 255, 255])
+    )
+    green: ColorRange = ColorRange(
+        np.array([40, 100, 50]), np.array([80, 255, 255])
+    )
+    blue: ColorRange = ColorRange(
+        np.array([100, 180, 60]), np.array([130, 255, 255])
+    )
+    magenta: ColorRange = ColorRange(
+        np.array([145, 150, 100]), np.array([170, 255, 255])
+    )
+
+    # Pixel area validation
+    min_color_area: int = 30_000
+
+    # Median blur sizes
+    blur_small_sign: int = 7
+    blur_big_sign: int = 15
+
+
+@dataclass(frozen=True)
+class CameraConfig:
+    roi_width_ratio: float = 0.5
+    roi_height_ratio: float = 0.5
+
+    rectangle_color: tuple = (255, 255, 255)
+    rectangle_thickness: int = 2
+
+    text_font = cv2.FONT_HERSHEY_DUPLEX
+    text_scale: float = 2.0
+    text_thickness: int = 3
+
+
+def get_sign_mask(image: np.ndarray, config: MaskConfig) -> np.ndarray | None:
+    """Create the binary mask of a sign showing on the picture.
+
+    Detects the outer border of a sign and returns a binary mask
+    (white shape on black background).
+
+    Args:
+        image: Cropped BGR image where the sign is expected.
+        config: MaskConfig containing all algorithm parameters.
+
+    Returns:
+        Binary mask (uint8) with the detected sign filled in white (255),
+        None if no valid contour is found.
+    """
+    # Convert to grayscale and smooth
+    gray_img = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+    blurred_gray_img = cv2.GaussianBlur(
+        gray_img,
+        config.gaussian_kernel_size,
+        config.gaussian_sigma
+    )
+    # Sobel gradients
+    gx = cv2.Sobel(
+        blurred_gray_img,
+        config.sobel_ddepth,
+        1, 0
+    )
+    gy = cv2.Sobel(
+        blurred_gray_img,
+        config.sobel_ddepth,
+        0, 1
+    )
+    # Gradient magnitude and normalization
+    gradient_magnitude = cv2.sqrt(gx ** 2 + gy ** 2)
+    mag_norm = cv2.normalize(
+        gradient_magnitude,
+        None,
+        0,
+        config.max_binary_value,
+        cv2.NORM_MINMAX,
+        cv2.CV_8U
+    )
+    # Binary thresholding
+    _, threshold = cv2.threshold(
+        mag_norm,
+        config.edge_threshold,
+        config.max_binary_value,
+        cv2.THRESH_BINARY
+    )
+    # Fill noisy gaps inside the sign's border using morphological closing
+    kernel = np.ones(config.morph_kernel_size, np.uint8)
+    closing = cv2.morphologyEx(
+        threshold,
+        config.morph_operation,
+        kernel
+    )
+    # Contours extraction from the sign shape obtained
+    # with moprhological closing.
+    #
+    # Uses `cv2.RETR_EXTERNAL` to only retrive external countours
+    # and `cv2.CHAIN_APPROX_SIMPLE` to reduce the amount of pixels
+    # used to represent the contours (eg. only store the 4 corners
+    # if the sign is rectangular).
+    contours, _ = cv2.findContours(
+        closing,
+        cv2.RETR_EXTERNAL,
+        cv2.CHAIN_APPROX_SIMPLE
+    )
+
+    if not contours:
+        return None
+
+    # Select the largest contour
+    largest_contour = max(contours, key=cv2.contourArea)
+    if cv2.contourArea(largest_contour) <= config.min_contour_area:
+        return None
+
+    # Create the sign's binary mask with the largest countour
+    mask = np.zeros_like(gray_img)
+    cv2.drawContours(
+        mask,
+        [largest_contour],
+        -1,
+        config.max_binary_value,
+        thickness=-1
+    )
+    return mask
+
+
+def compute_color_surface(
+        hsv_img: Any, color: ColorRange, blur_ksize: int
+) -> int:
+    mask = cv2.inRange(hsv_img, color.lower, color.upper)
+    mask = cv2.medianBlur(mask, blur_ksize)
+    return int(np.sum(mask))
+
+
+def compute_red_surface(
+        hsv_img, red1: ColorRange, red2: ColorRange, blur_ksize: int
+) -> int:
+    mask1 = cv2.inRange(hsv_img, red1.lower, red1.upper)
+    mask2 = cv2.inRange(hsv_img, red2.lower, red2.upper)
+    merged = cv2.addWeighted(mask1, 1.0, mask2, 1.0, 0)
+    merged = cv2.medianBlur(merged, blur_ksize)
+    return int(np.sum(merged))

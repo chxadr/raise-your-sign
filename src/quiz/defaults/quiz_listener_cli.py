@@ -67,8 +67,7 @@ class QuizListenerCLI(QuizListener):
         ))
 
     def print_results_plots(self, path: str) -> None:
-        """Print simple terminal bar plots for scores, accuracy, and
-        per-question results.
+        """Print simple terminal bar plots.
 
         Print simple terminal bar plots for scores, accuracy, and
         per-question results using the `plotext` module. The file

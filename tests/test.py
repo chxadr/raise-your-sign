@@ -1,8 +1,12 @@
-import quiz.defaults as qd
 import quiz.core as qc
+import quiz.defaults as qd
+import quiz.cv as qcv
 import tkinter as tk
 
+
 def main():
+    n_opts = 3
+
     quiz = qd.Quiz(["Julia", "Adrien"])
     controller: qc.QuizController | None = None
     view: qc.QuizListener | None = None
@@ -11,9 +15,15 @@ def main():
     controller: qc.QuizController | None = None
     view: qc.QuizListener | None = None
 
-    # Ajout de l'option Vision dans le menu
     print("--- RAISE YOUR SIGN ---")
-    style = int(input("(1) CLI\t(2) GUI (TKinter)\t(3) VISION (Caméra): "))
+    style: int | str | None = None
+    while True:
+        style = input("(1) CLI   (2) GUI (TKinter)   (3) CLI & CV (OpenCV): ")
+        if style.isdigit() and 1 <= int(style) <= n_opts:
+            style = int(style)
+            break
+        else:
+            print(f"Input a number within the range 1-{n_opts}")
 
     if style == 1:
         view = qd.QuizListenerCLI()
@@ -24,11 +34,8 @@ def main():
         controller = qd.QuizControllerGUI(quiz, view)
     elif style == 3:
         view = qd.QuizListenerCLI()
-        controller = qd.QuizControllerVision(quiz)
-    else:
-        print("Choix invalide.")
-        return
-    
+        controller = qcv.QuizControllerCVCLI(quiz)
+
     quiz.add_listener([view, sounds])
     controller.run_quiz()
 

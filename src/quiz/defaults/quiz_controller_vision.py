@@ -4,7 +4,7 @@ from quiz.core.quiz_controller import QuizController
 
 class QuizControllerVision(QuizController):
     """
-    Le ControleurVision capture des images provenant d'une caméra, identifie 
+    Le ControleurVision capture des images provenant de la caméra, identifie 
     les bordures de panneaux et analyse la couleur contenue dans ces bordures 
     fermées, soit les bordures qui forment un cadre (rond ou carré), pour 
     déterminer la réponse du joueur.
@@ -27,16 +27,16 @@ class QuizControllerVision(QuizController):
 
     def get_mask(self, image):
         """Fonction qui détecte le cadre extérieur du panneau et renvoie un 
-        masque binaire en utilisant un filtre de Sobel pour calculer le 
-        gradient de l'image. Aussi j'applique une fermeture morphologique 
-        morphologyEx() pour s'assurer que les bordures détectés soient une
-        surface fermée, ici pancarte ronde ou carré (on ne fait donc pas la 
+        masque binaire (forme blanche sur fond noir) en utilisant un filtre de 
+        Sobel pour calculer le gradient de l'image. Aussi j'applique une fermeture 
+        morphologique morphologyEx() pour assurer que les bordures détectés soient 
+        une surface fermée, ici pancarte ronde ou carré (donc on ne fait pas la 
         différence entre les formes).
         Args:
             image: Uniquement la région de l'image encadrée par un rectangle 
-            aux contours blancs en haut à gauche de l'image de retour caméra.
+            aux contours blancs en haut à gauche du retour caméra.
         Returns:
-            Une masque binaire où la zone du panneau détectée est blanche (255),
+            Un masque binaire (fond noir) où la zone du panneau détectée est blanche (255),
             ou None si aucun cadre n'est trouvé.        
         """
         gris = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)

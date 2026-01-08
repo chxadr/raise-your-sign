@@ -37,6 +37,76 @@ class QuizControllerCVCLI(QuizController):
         self.quiz.inform_player(["\nPress ENTER to continue"])
         input()
 
+    def detect_color(self, roi, n_opts, color_detectors) -> int | None:
+        sign_mask = get_sign_mask(roi, self.mask_config)
+        if sign_mask is None:
+            return None
+
+        hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+        hsv_masked = cv2.bitwise_and(hsv, hsv, mask=sign_mask)
+
+        surfaces = [
+            detector(hsv_masked)
+            for _, detector in color_detectors[:n_opts]
+        ]
+
+        max_surface = max(surfaces)
+        if max_surface <= self.colors.min_color_area:
+            return None
+
+        return surfaces.index(max_surface)
+
+    def update_hold_timer(
+            self,
+            detected_index: int | None,
+            current_color_index: int | None,
+            timer: Timer
+    ) -> tuple[int | None, bool]:
+        """
+        Returns:
+        (new_current_color_index, validated)
+        """
+        if detected_index is None:
+            timer.stop()
+            return None, False
+
+        if detected_index != current_color_index:
+            timer.reset()
+            return detected_index, False
+
+        if timer.expired():
+            return current_color_index, True
+
+        return current_color_index, False
+
+    def draw_progress_bar(self, frame: Any, progress: float) -> None:
+        h = frame.shape[0]
+        bar_w = int(200 * progress)
+        cv2.rectangle(
+            frame, (20, h - 40), (220, h - 20), (255, 255, 255), 2
+        )
+        cv2.rectangle(
+            frame, (20, h - 40), (20 + bar_w, h - 20), (0, 255, 0), -1
+        )
+
+    def draw_answer_text(self, frame: Any, text: str) -> None:
+        h, w = frame.shape[:2]
+        ts, _ = cv2.getTextSize(
+            text,
+            self.camera.text_font,
+            self.camera.text_scale,
+            self.camera.text_thickness
+        )
+        x = max(10, (w - ts[0]) // 2)
+        y = min(h - 10, int(h * 0.85))
+        cv2.putText(
+            frame, text, (x, y),
+            self.camera.text_font,
+            self.camera.text_scale,
+            (255, 255, 255),
+            self.camera.text_thickness
+        )
+
     def run_quiz(self):
         hold_timer = Timer(duration=QuizControllerCVCLI.HOLD_TIME)
         color_detectors = [
@@ -98,7 +168,6 @@ class QuizControllerCVCLI(QuizController):
                     ])
                     answer_index = -1
                     current_color_index: int | None = None
-                    detected_index: int | None = None
 
                     while True:
                         ret, frame = self.cap.read()
@@ -110,81 +179,44 @@ class QuizControllerCVCLI(QuizController):
                         roi_h = int(h * self.camera.roi_height_ratio)
                         roi = frame[:roi_h, :roi_w]
 
-                        sign_mask = get_sign_mask(roi, self.mask_config)
-                        text = ""
+                        detected_index = self.detect_color(
+                            roi, n_opts, color_detectors
+                        )
 
-                        if sign_mask is not None:
-                            hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
-                            hsv_masked = cv2.bitwise_and(
-                                hsv, hsv, mask=sign_mask
+                        current_color_index, validated \
+                            = self.update_hold_timer(
+                                detected_index,
+                                current_color_index,
+                                hold_timer
                             )
 
-                            surfaces = [
-                                detector(hsv_masked)
-                                for _, detector in color_detectors[:n_opts]
-                            ]
+                        if detected_index is not None:
+                            answer = self.quiz.get_options()[detected_index]
+                            color_name = color_detectors[detected_index][0]
+                            text = f"{color_name}: {answer}"
+                            self.draw_answer_text(frame, text)
 
-                            max_surface = max(surfaces)
+                            if hold_timer.running() and not validated:
+                                self.draw_progress_bar(
+                                    frame, hold_timer.progress()
+                                )
 
-                            if max_surface > self.colors.min_color_area:
-                                detected_index = surfaces.index(max_surface)
-                                answer = self.quiz.get_options()[detected_index]
-                                color_name = color_detectors[detected_index][0]
-                                text = f"{color_name}: {answer}"
+                        if validated:
+                            answer_index = current_color_index
+                            break
 
-                                if detected_index is not None:
-
-                                    if detected_index != current_color_index:
-                                        current_color_index = detected_index
-                                        hold_timer.reset()
-
-                                    elif hold_timer.expired():
-                                        answer_index = current_color_index
-                                        break
-
-                                    else:
-                                        progress = hold_timer.progress()
-                                        bar_w = int(200 * progress)
-                                        cv2.rectangle(
-                                            frame, (20, h - 40), (220, h - 20), (255, 255, 255), 2
-                                        )
-                                        cv2.rectangle(
-                                            frame, (20, h - 40), (20 + bar_w, h - 20), (0, 255, 0), -1
-                                        )
-
-                        else:
-                            current_color_index = None
-                            hold_timer.stop()
-
+                        roi_w = roi.shape[1]
+                        roi_h = roi.shape[0]
                         cv2.rectangle(
                             frame, (0, 0), (roi_w, roi_h),
                             self.camera.rectangle_color,
                             self.camera.rectangle_thickness
                         )
 
-                        if text:
-                            ts, _ = cv2.getTextSize(
-                                text,
-                                self.camera.text_font,
-                                self.camera.text_scale,
-                                self.camera.text_thickness
-                            )
-                            x = max(10, (w - ts[0]) // 2)
-                            y = min(h - 10, int(h * 0.85))
-                            cv2.putText(
-                                frame, text,
-                                (x, y),
-                                self.camera.text_font,
-                                self.camera.text_scale,
-                                (255, 255, 255),
-                                self.camera.text_thickness
-                            )
-
                         cv2.imshow("Detection Raise-Your-Sign", frame)
                         cv2.waitKey(1)
 
                     self.quiz.record_answer(answer_index)
-                    current_color_index = None
 
             self.release_resources()
             self.quiz.end([self.quiz.output_file])

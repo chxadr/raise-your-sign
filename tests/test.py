@@ -33,8 +33,8 @@ def main():
         view = qd.QuizListenerGUI(root)
         controller = qd.QuizControllerGUI(quiz, view)
     elif style == 3:
-        view = qd.QuizListenerCLI()
         controller = qcv.QuizControllerCVCLI(quiz)
+        view = qd.QuizListenerCLI(controller.color_names)
 
     quiz.add_listener([view, sounds])
     controller.run_quiz()

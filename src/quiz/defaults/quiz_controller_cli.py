@@ -71,8 +71,6 @@ class QuizControllerCLI(QuizController):
                             f"Input a number within the range 1-{n_opts}"
                         ])
 
-                    self.wait_player()
-
             self.quiz.end([self.quiz.output_file])
             self.wait_player()
 

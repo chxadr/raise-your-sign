@@ -24,11 +24,19 @@ class QuizListenerCLI(QuizListener):
     Attributes:
         question_string: A formatted string representing the current question
             and its answer options for display.
+        color_names: Optional list of color names used to label answer options
+            (e.g. ["Green", "Red", "Yellow"]).
     """
 
-    def __init__(self):
-        """Initialize the CLI listener."""
+    def __init__(self, color_names: list[str] | None = None):
+        """Initialize the CLI listener.
+
+        Args:
+            color_names: Optional list of color names used to label answer options
+                (e.g. ["Green", "Red", "Yellow"]).
+        """
         self.question_string = ""
+        self.color_names = color_names
 
     def build_question_string(self, args: list[str]) -> None:
         """Build a formatted string for the current question and its options.
@@ -40,7 +48,11 @@ class QuizListenerCLI(QuizListener):
         self.question_string = f"Question: {args[0]}"
         if len(args) > 1:
             for i, option in enumerate(args[1:]):
-                self.question_string += f"\n{i+1}. {option}"
+                index = i + 1
+                indication = index if self.color_names is None \
+                    or len(self.color_names) < index \
+                    else self.color_names[i]
+                self.question_string += f"\n{indication}. {option}"
 
     def print_question_string(self):
         """Print the currently built question string."""

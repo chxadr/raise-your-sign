@@ -172,7 +172,7 @@ def compute_color_surface(
 
 
 def compute_red_surface(
-        hsv_img, red1: ColorRange, red2: ColorRange, blur_ksize: int
+        hsv_img: Any, red1: ColorRange, red2: ColorRange, blur_ksize: int
 ) -> int:
     mask1 = cv2.inRange(hsv_img, red1.lower, red1.upper)
     mask2 = cv2.inRange(hsv_img, red2.lower, red2.upper)

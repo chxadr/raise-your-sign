@@ -1,3 +1,10 @@
+"""Computer vision utility helpers for the CV quiz controllers.
+
+This module provides configuration dataclasses and low-level image-processing
+functions used for sign detection, masking and color surface computation
+within the computer vision (CV) layer of the quiz controllers.
+"""
+
 import cv2
 import numpy as np
 from dataclasses import dataclass
@@ -6,6 +13,22 @@ from typing import Any
 
 @dataclass(frozen=True)
 class MaskConfig:
+    """Configuration parameters for sign mask extraction.
+
+    This class groups all tunable parameters used in the edge-based
+    detection pipeline that extracts the outer shape of a sign.
+
+    Attributes:
+        gaussian_kernel_size: Kernel size used for Gaussian blur.
+        gaussian_sigma: Standard deviation for Gaussian blur.
+        sobel_ddepth: Desired depth of the Sobel derivative images.
+        edge_threshold: Threshold value used for gradient binarization.
+        max_binary_value: Maximum binary value for thresholded images.
+        morph_kernel_size: Kernel size for morphological operations.
+        morph_operation: Morphological operation applied (e.g. closing).
+        min_contour_area: Minimum contour area to be considered valid.
+    """
+
     # Gaussian blur
     gaussian_kernel_size: tuple = (5, 5)
     gaussian_sigma: float = 0.0
@@ -27,12 +50,38 @@ class MaskConfig:
 
 @dataclass(frozen=True)
 class ColorRange:
+    """HSV color range definition.
+
+    Represents a lower and upper HSV boundary used for color segmentation.
+
+    Attributes:
+        lower: Lower HSV bound.
+        upper: Upper HSV bound.
+    """
     lower: np.ndarray
     upper: np.ndarray
 
 
 @dataclass(frozen=True)
 class ColorDetectionConfig:
+    """Configuration parameters for color-based detection.
+
+    This class defines HSV ranges for multiple colors as well as
+    validation and filtering parameters used when detecting colored
+    regions on signs.
+
+    Attributes:
+        red1: First HSV range for red color.
+        red2: Second HSV range for red color (wrap-around).
+        yellow: HSV range for yellow color.
+        green: HSV range for green color.
+        blue: HSV range for blue color.
+        magenta: HSV range for magenta color.
+        min_color_area: Minimum pixel surface for valid color detection.
+        blur_big_sign: Median blur kernel size for large signs.
+        blur_small_sign: Median blur kernel size for small signs.
+    """
+
     # HSV color ranges
     red1: ColorRange = ColorRange(
         np.array([0, 170, 100]), np.array([10, 255, 255])
@@ -57,12 +106,26 @@ class ColorDetectionConfig:
     min_color_area: int = 30_000
 
     # Median blur sizes
-    blur_small_sign: int = 7
-    blur_big_sign: int = 15
+    blur_big_sign: int = 7
+    blur_small_sign: int = 15
 
 
 @dataclass(frozen=True)
 class CameraConfig:
+    """Configuration parameters for camera visualization and ROI handling.
+
+    This class stores constants related to region-of-interest (ROI)
+    definition and overlay rendering on camera frames.
+
+    Attributes:
+        roi_width_ratio: Width ratio of the ROI relative to frame width.
+        roi_height_ratio: Height ratio of the ROI relative to frame height.
+        rectangle_color: BGR color of the ROI rectangle.
+        rectangle_thickness: Thickness of the ROI rectangle border.
+        text_font: OpenCV font used for overlay text.
+        text_scale: Scale factor for overlay text.
+        text_thickness: Thickness of overlay text strokes.
+    """
     roi_width_ratio: float = 0.5
     roi_height_ratio: float = 0.5
 
@@ -164,16 +227,48 @@ def get_sign_mask(image: np.ndarray, config: MaskConfig) -> np.ndarray | None:
 
 
 def compute_color_surface(
-        hsv_img: Any, color: ColorRange, blur_ksize: int
+        hsv_img: Any,
+        color: ColorRange,
+        blur_ksize: int
 ) -> int:
+    """Compute the pixel surface of a given color range.
+
+    This function thresholds an HSV image using the provided color range,
+    applies median blurring and returns the summed pixel intensity.
+
+    Args:
+        hsv_img: HSV image used for color segmentation.
+        color: ColorRange defining the HSV boundaries.
+        blur_ksize: Kernel size for median blur.
+
+    Returns:
+        The summed pixel surface of the detected color region.
+    """
     mask = cv2.inRange(hsv_img, color.lower, color.upper)
     mask = cv2.medianBlur(mask, blur_ksize)
     return int(np.sum(mask))
 
 
 def compute_red_surface(
-        hsv_img: Any, red1: ColorRange, red2: ColorRange, blur_ksize: int
+        hsv_img: Any,
+        red1: ColorRange,
+        red2: ColorRange,
+        blur_ksize: int
 ) -> int:
+    """Compute the pixel surface of red color using dual HSV ranges.
+
+    This function handles the HSV wrap-around of red by combining two
+    separate red masks before blurring and surface computation.
+
+    Args:
+        hsv_img: HSV image used for color segmentation.
+        red1: First red HSV range.
+        red2: Second red HSV range.
+        blur_ksize: Kernel size for median blur.
+
+    Returns:
+        The summed pixel surface of the detected red regions.
+    """
     mask1 = cv2.inRange(hsv_img, red1.lower, red1.upper)
     mask2 = cv2.inRange(hsv_img, red2.lower, red2.upper)
     merged = cv2.addWeighted(mask1, 1.0, mask2, 1.0, 0)

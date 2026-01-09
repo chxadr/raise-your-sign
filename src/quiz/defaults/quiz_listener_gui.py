@@ -37,18 +37,31 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
         canvas: `matplotlib` canvas used for plotting results
             (initialized during plots).
         plot_window: Toplevel window for displaying result plots.
+        color_names: Optional list of color names used to label answer options
+            (e.g. ["Green", "Red", "Yellow"]).
     """
 
-    def __init__(self, master: ttk.Frame):
+    def __init__(
+            self,
+            master: ttk.Frame,
+            min_w: int = 700,
+            min_h: int = 300,
+            color_names: list[str] | None = None
+    ):
         """Initialize the GUI listener and configure the main window.
 
         Args:
             master: The parent `tkinter` frame.
+            min_w: Minium width for the display window.
+            min_h: Minimum height for the display window.
+            color_names: Optional list of color names used to label answer
+                options (e.g. ["Green", "Red", "Yellow"]).
         """
         super().__init__(master, padding=20)
+        self.color_names = color_names
         self.master = master
         self.master.wm_title("Quiz")
-        self.master.minsize(700, 300)
+        self.master.minsize(min_w, min_h)
 
         # Allows good integration with tiled window managers on UNIX systems.
         self.master.attributes('-type', 'dialog')
@@ -76,7 +89,11 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
         self.question_string = f"Question: {args[0]}"
         if len(args) > 1:
             for i, option in enumerate(args[1:]):
-                self.question_string += f"\n{i+1}. {option}"
+                index = i + 1
+                indication = index if self.color_names is None \
+                    or len(self.color_names) < index \
+                    else self.color_names[i]
+                self.question_string += f"\n{indication}. {option}"
 
     def wrap_labels(self, ax: Any, width: int,
                     break_long_words: bool = False) -> None:

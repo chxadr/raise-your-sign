@@ -84,22 +84,28 @@ class ColorDetectionConfig:
 
     # HSV color ranges
     red1: ColorRange = ColorRange(
-        np.array([0, 170, 100]), np.array([10, 255, 255])
+        # np.array([0, 170, 100]), np.array([10, 255, 255])
+        np.array([0, 170, 100]), np.array([6, 255, 255])
     )
     red2: ColorRange = ColorRange(
+        # np.array([170, 170, 100]), np.array([180, 255, 255])
         np.array([170, 170, 100]), np.array([180, 255, 255])
     )
     yellow: ColorRange = ColorRange(
-        np.array([15, 150, 150]), np.array([32, 255, 255])
+        # np.array([15, 150, 150]), np.array([32, 255, 255])
+        np.array([12, 90, 70]), np.array([30, 255, 255])
     )
     green: ColorRange = ColorRange(
+        # np.array([40, 100, 50]), np.array([80, 255, 255])
         np.array([40, 100, 50]), np.array([80, 255, 255])
     )
     blue: ColorRange = ColorRange(
-        np.array([100, 180, 60]), np.array([130, 255, 255])
+        # np.array([100, 180, 60]), np.array([130, 255, 255])
+        np.array([100, 180, 50]), np.array([140, 255, 255])
     )
     magenta: ColorRange = ColorRange(
-        np.array([145, 150, 100]), np.array([170, 255, 255])
+        # np.array([145, 150, 100]), np.array([170, 255, 255])
+        np.array([145, 150, 120]), np.array([165, 255, 255])
     )
 
     # Pixel area validation
@@ -133,8 +139,8 @@ class CameraConfig:
     rectangle_thickness: int = 2
 
     text_font = cv2.FONT_HERSHEY_DUPLEX
-    text_scale: float = 2.0
-    text_thickness: int = 3
+    text_scale: float = 1.0
+    text_thickness: int = 1
 
 
 def get_sign_mask(image: np.ndarray, config: MaskConfig) -> np.ndarray | None:

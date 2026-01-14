@@ -357,6 +357,12 @@ class QuizControllerCVGUI(QuizController):
 
     @override
     def run_quiz(self) -> None:
+        def safe_controller_task():
+            try:
+                self.controller_task()
+            except Exception:
+                pass
+
         self.quiz.begin()
-        self.view.after(0, self.controller_task)
+        self.view.after(0, safe_controller_task)
         self.view.mainloop()

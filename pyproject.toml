@@ -28,6 +28,12 @@ classifiers = [
     "Operating System :: OS Independent"
 ]
 
+[project.optional-dependencies]
+dev = [
+    "pyinstaller",
+    "py2exe"
+]
+
 [project.urls]
 Homepage = "https://github.com/chxadr/raise-your-sign"
 Repository = "https://github.com/chxadr/raise-your-sign"

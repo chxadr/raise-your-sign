@@ -63,8 +63,9 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
         self.master.wm_title("Quiz")
         self.master.minsize(min_w, min_h)
 
-        # Allows good integration with tiled window managers on UNIX systems.
-        self.master.attributes('-type', 'dialog')
+        if sys.platform != "win32":
+            # Allows good integration with tiled window managers on UNIX systems.
+            self.master.attributes('-type', 'dialog')
         self.master.protocol("WM_DELETE_WINDOW", self.destroy_all)
 
         self.pack(expand=True, fill="both")

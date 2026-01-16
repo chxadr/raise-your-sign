@@ -101,11 +101,13 @@ class ColorDetectionConfig:
     )
     blue: ColorRange = ColorRange(
         # np.array([100, 180, 60]), np.array([130, 255, 255])
-        np.array([100, 180, 50]), np.array([140, 255, 255])
+        # np.array([100, 180, 50]), np.array([140, 255, 255])
+        np.array([95, 150, 125]), np.array([115, 255, 255])
     )
     magenta: ColorRange = ColorRange(
         # np.array([145, 150, 100]), np.array([170, 255, 255])
-        np.array([145, 150, 120]), np.array([165, 255, 255])
+        # np.array([145, 150, 120]), np.array([165, 255, 255])
+        np.array([150, 135, 120]), np.array([170, 255, 255])
     )
 
     # Pixel area validation

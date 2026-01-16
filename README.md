@@ -1,10 +1,10 @@
 # Raise Your Sign
 
-An interactive quiz program that allows users to respond to questions by raising signs.
+An interactive quiz program that allows users to respond to questions by raising signs. 
 
-## For developers
+## Installing and testing the project
 
-### Installing the project
+### Installation
 
 To get started, first clone the GitHub repository to your local machine:
 
@@ -39,6 +39,10 @@ Next, you need to install the project setup.
   This will install Pyhton 3.13 (if you have the Python Install Manager installed)
   and provide the necessary dependencies.
 
+### Test
+
+Once the installation done, go to the `test` directory and just run `python test.py`.
+
 ### Cleaning files
 
 Sometimes when you add or remove features in the project, it's important to clear Python's cache. This can help prevent strange bugs.
@@ -58,8 +62,4 @@ Sometimes when you add or remove features in the project, it's important to clea
   ```cmd
   scripts\clean.cmd
   ```
-
-### Test your code
-
-> [!IMPORTANT]  
-> Add explanations for code testing.
+  

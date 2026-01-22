@@ -1,0 +1,4 @@
+{"question":"Is Python a programming language?","options":["Yes","No"],"correct_answer":"Yes"}
+{"question":"Which of these is not a programming language?","options":["Rust","Java","HTML","C++"],"correct_answer":"HTML"}
+{"question":"What ROI stands for in computer vision?","options":["Rate Of Image","Root Of Issue","Region Of Interest","Ratio Of Inputs", "Region Of Image"],"correct_answer":"Region Of Interest"}
+{"question":"Is OpenCV an open source library?","options":["Of course","Hell no"],"correct_answer":"Of course"}

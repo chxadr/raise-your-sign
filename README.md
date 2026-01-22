@@ -43,6 +43,28 @@ Next, you need to install the project setup.
 
 Once the installation done, go to the `test` directory and just run `python test.py`.
 
+### Building the default executable
+
+- **On UNIX-like systems:**
+
+  Simply run the following command in your terminal:
+
+  ```sh
+  make build
+  ```
+
+  This will build an executable inside the `main/dist/` directory. You can then run the executable with `make run`
+
+- **On Windows:**
+
+  You can use the provided script from **Command Prompt**:
+
+  ```cmd
+  scripts\compilexe.cmd
+  ```
+
+  Once done just navigate to the `main/dist/` directory to run the `quiz.exe` executable.
+
 ### Cleaning files
 
 Sometimes when you add or remove features in the project, it's important to clear Python's cache. This can help prevent strange bugs.

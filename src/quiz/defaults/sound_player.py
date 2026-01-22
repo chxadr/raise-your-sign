@@ -15,8 +15,15 @@ import sys
 import nava
 
 
-HERE = Path(__file__).resolve().parent
-RESOURCES = f"{HERE}/resources"
+def resource_path(relative: str) -> Path:
+    """Return absolute path to resource, works for dev and PyInstaller."""
+    if hasattr(sys, "_MEIPASS"):
+        # PyInstaller temp folder
+        return Path(sys._MEIPASS) / relative
+    return Path(__file__).resolve().parent / relative
+
+
+RESOURCES = resource_path("resources")
 
 
 class SoundPlayer(QuizListener):
@@ -26,18 +33,19 @@ class SoundPlayer(QuizListener):
     playing corresponding audio cues using the `nava` library.
     """
 
-    def play(self, path: str) -> None:
+    def play(self, path: Path) -> None:
         """Play a sound file asynchronously.
 
-        Errors raised during playback are caught and printed to avoid
-        interrupting quiz execution.
+        The provided path is converted to a string before being passed
+        to the audio backend. Any exceptions raised during playback are
+        caught and printed to stderr so that audio errors do not
+        interrupt the quiz flow.
 
         Args:
-            path: Path to the sound file to play.
+            path: Filesystem path to the sound file to play.
         """
         try:
-            # `async_mode=True` is required for a non-blocking behaviour.
-            nava.play(path, async_mode=True)
+            nava.play(str(path), async_mode=True)
         except Exception as e:
             print(e, file=sys.stderr)
 
@@ -46,16 +54,16 @@ class SoundPlayer(QuizListener):
         match e:
 
             case QuizEvent.BEGIN:
-                self.play(f"{RESOURCES}/begin.wav")
+                self.play(RESOURCES / "begin.wav")
 
             case QuizEvent.QUESTION:
-                self.play(f"{RESOURCES}/hint.wav")
+                self.play(RESOURCES / "hint.wav")
 
             case QuizEvent.ASK_PLAYER:
-                self.play(f"{RESOURCES}/valid.wav")
+                self.play(RESOURCES / "valid.wav")
 
             case QuizEvent.INFO:
                 pass
 
             case QuizEvent.END:
-                self.play(f"{RESOURCES}/won.wav")
+                self.play(RESOURCES / "won.wav")

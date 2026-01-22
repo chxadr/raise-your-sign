@@ -57,7 +57,7 @@ Once the installation done, go to the `test` directory and just run `python test
 
 - **On Windows:**
 
-  You can use the provided script from **Command Prompt**:
+  You can run the provided script from **Command Prompt**:
 
   ```cmd
   scripts\compilexe.cmd

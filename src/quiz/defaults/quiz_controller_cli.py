@@ -7,6 +7,7 @@ quiz events with the quiz model.
 """
 
 from quiz.core.quiz_controller import QuizController
+from quiz.core.quiz_model import QuizModel
 
 from typing import override
 import os
@@ -14,6 +15,9 @@ import os
 
 class QuizControllerCLI(QuizController):
     """CLI-based quiz controller that manages quiz flow in the terminal."""
+
+    def __init__(self, quiz: QuizModel):
+        super().__init__(quiz)
 
     def wait_player(self):
         """Pause the quiz until the player presses ENTER."""

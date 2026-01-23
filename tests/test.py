@@ -6,11 +6,9 @@ import tkinter as tk
 
 def main():
     n_opts = 4
-    custom_colors = [
-        "Green", "Red", "Yellow", "Blue", "Magenta"
-    ]
 
-    quiz = qd.Quiz(["Julia", "Adrien"])
+    quiz = qd.Quiz()
+    quiz.set_players(["Julia", "Adrien"])
     controller: qc.QuizController | None = None
     view: qc.QuizListener | None = None
     sounds = qd.SoundPlayer()
@@ -39,11 +37,11 @@ def main():
         view = qd.QuizListenerGUI(root)
         controller = qd.QuizControllerGUI(quiz, view)
     elif style == 3:
-        view = qd.QuizListenerCLI(color_names=custom_colors)
-        controller = qcv.QuizControllerCVCLI(quiz)
+        view = qd.QuizListenerCLI()
+        controller = qcv.QuizControllerCVCLI(quiz, view)
     elif style == 4:
         root = tk.Tk()
-        view = qd.QuizListenerGUI(root, color_names=custom_colors)
+        view = qd.QuizListenerGUI(root)
         controller = qcv.QuizControllerCVGUI(quiz, view)
 
     quiz.add_listener([view, sounds])

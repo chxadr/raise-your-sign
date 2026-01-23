@@ -77,13 +77,13 @@ class Quiz(QuizModel):
             print(e, file=sys.stderr)
             return fallback
 
-    def __init__(self, player_names: list[str]):
+    def __init__(self):
         """Initialize the quiz with a list of player names.
 
         Args:
             player_names: List of player names participating in the quiz.
         """
-        super().__init__(player_names)
+        super().__init__()
         self.player_index = -1
         self.line_index = -1
         timestamp = datetime.datetime.now().strftime("%Y%m%d%H%M%S")
@@ -114,6 +114,7 @@ class Quiz(QuizModel):
         Returns:
             The current player's name, or an empty string if out of bounds.
         """
+        self.requires_players()
         try:
             return self.players[self.player_index]
         except IndexError:
@@ -126,6 +127,7 @@ class Quiz(QuizModel):
         Args:
             answer_index: Index of the selected answer option.
         """
+        self.requires_players()
         n_opts = len(self.line["options"])
         if 0 <= answer_index < n_opts:
             question = self.get_question()
@@ -179,6 +181,7 @@ class Quiz(QuizModel):
         Returns:
             True if a next player exists, False otherwise.
         """
+        self.requires_players()
         self.player_index += 1
         if self.get_player_name() == "":
             return False

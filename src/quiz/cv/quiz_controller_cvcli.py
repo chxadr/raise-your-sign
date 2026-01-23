@@ -11,6 +11,7 @@ from typing import Any, override
 
 from quiz.core.quiz_model import QuizModel
 from quiz.core.quiz_controller import QuizController
+from quiz.core.quiz_listener import QuizListener
 from .cv_utils import (
     MaskConfig,
     ColorDetectionConfig,
@@ -41,7 +42,7 @@ class QuizControllerCVCLI(QuizController):
 
     HOLD_TIME = 2.0
 
-    def __init__(self, quiz: QuizModel):
+    def __init__(self, quiz: QuizModel, view: QuizListener):
         """Initialize the CV-based quiz controller.
 
         Args:
@@ -52,6 +53,7 @@ class QuizControllerCVCLI(QuizController):
         self.color_names = [
             "Green", "Red", "Yellow", "Blue", "Magenta"
         ]
+        view.set_answer_labels(self.color_names)
         self.camera = CameraConfig()
         self.mask_config = MaskConfig()
         self.cap: Any | None = None

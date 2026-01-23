@@ -11,11 +11,13 @@ from typing import Any, override
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog as fd
+from tkinter import simpledialog
 
 from PIL import Image, ImageTk
 
 from quiz.core.quiz_model import QuizModel
 from quiz.core.quiz_controller import QuizController
+from quiz.defaults.quiz_listener_gui import QuizListenerGUI
 from .cv_utils import (
     MaskConfig,
     ColorDetectionConfig,
@@ -25,6 +27,7 @@ from .cv_utils import (
     compute_red_surface
 )
 from quiz.utils.timer_utils import Timer
+from quiz.utils.username_dialog import UsernameDialog
 
 
 class QuizControllerCVGUI(QuizController):
@@ -50,7 +53,7 @@ class QuizControllerCVGUI(QuizController):
 
     HOLD_TIME = 2.0
 
-    def __init__(self, quiz: QuizModel, view: ttk.Frame):
+    def __init__(self, quiz: QuizModel, view: QuizListenerGUI):
         """Initialize the GUI-based CV quiz controller.
 
         Args:
@@ -63,6 +66,7 @@ class QuizControllerCVGUI(QuizController):
         self.color_names = [
             "Green", "Red", "Yellow", "Blue", "Magenta"
         ]
+        self.view.set_answer_labels(self.color_names)
         self.camera = CameraConfig()
         self.mask_config = MaskConfig()
         self.cap: Any | None = None
@@ -278,6 +282,10 @@ class QuizControllerCVGUI(QuizController):
         if not self.cap.isOpened():
             self.quiz.inform_player(["Cannot open camera"])
             return
+
+        # Ask for players participating in the quiz
+        dialog = UsernameDialog(self.view)
+        self.quiz.set_players(dialog.usernames)
 
         while self.quiz.next_question():
             # A question is available.

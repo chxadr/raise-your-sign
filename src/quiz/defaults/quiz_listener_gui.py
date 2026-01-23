@@ -43,10 +43,9 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
 
     def __init__(
             self,
-            master: ttk.Frame,
+            master: tk.Toplevel,
             min_w: int = 700,
-            min_h: int = 300,
-            color_names: list[str] | None = None
+            min_h: int = 300
     ):
         """Initialize the GUI listener and configure the main window.
 
@@ -54,19 +53,18 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
             master: The parent `tkinter` frame.
             min_w: Minium width for the display window.
             min_h: Minimum height for the display window.
-            color_names: Optional list of color names used to label answer
-                options (e.g. ["Green", "Red", "Yellow"]).
         """
-        super().__init__(master, padding=20)
-        self.color_names = color_names
-        self.master = master
-        self.master.wm_title("Quiz")
-        self.master.minsize(min_w, min_h)
+        # NOTE: `tkinter` widgets are not cooperative ...
+        ttk.Frame.__init__(self, master=master, padding=20)
+        QuizListener.__init__(self)
+        master.wm_title("Quiz")
+        master.minsize(min_w, min_h)
 
         if sys.platform != "win32":
-            # Allows good integration with tiled window managers on UNIX systems.
-            self.master.attributes('-type', 'dialog')
-        self.master.protocol("WM_DELETE_WINDOW", self.destroy_all)
+            # Allows good integration with tiled window managers
+            # on UNIX systems.
+            master.attributes('-type', 'dialog')
+        master.protocol("WM_DELETE_WINDOW", self.destroy_all)
 
         self.pack(expand=True, fill="both")
 
@@ -87,14 +85,14 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
             args: List containing the question as the first element and
                 subsequent elements as answer options.
         """
-        self.question_string = f"Question: {args[0]}"
+        self.question_string = f"{args[0]}\n"
         if len(args) > 1:
             for i, option in enumerate(args[1:]):
                 index = i + 1
-                indication = index if self.color_names is None \
-                    or len(self.color_names) < index \
-                    else self.color_names[i]
-                self.question_string += f"\n{indication}. {option}"
+                indication = index if self.label_names is None \
+                    or len(self.label_names) < index \
+                    else self.label_names[i]
+                self.question_string += f"\n\t{indication}.\t{option}"
 
     def wrap_labels(self, ax: Any, width: int,
                     break_long_words: bool = False) -> None:
@@ -173,8 +171,9 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
         # This might be an issue related to the code quality.
         #
         # TODO: replace `quit()` with a production-friendly alternative.
-        self.master.quit()
-        self.master.destroy()
+        master = self.winfo_toplevel()
+        master.quit()
+        master.destroy()
 
     @override
     def on_event(self, e: QuizEvent, args: list[str] | None = None) -> None:

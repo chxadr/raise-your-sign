@@ -8,6 +8,7 @@ question display, player input through buttons and file selection.
 from quiz.core.quiz_model import QuizModel
 from quiz.core.quiz_controller import QuizController
 from quiz.core.quiz_event import QuizEvent
+from quiz.utils.username_dialog import UsernameDialog
 
 from typing import override
 
@@ -139,6 +140,10 @@ class QuizControllerGUI(QuizController):
                 if quiz_file == "":
                     return
                 self.quiz.set_quiz_file(quiz_file)
+
+                # Ask for players participating in the quiz
+                dialog = UsernameDialog(self.view)
+                self.quiz.set_players(dialog.usernames)
 
                 if self.quiz.next_question() and self.quiz.ask_next_player():
                     # Show the first question

@@ -17,7 +17,25 @@ class QuizListener(ABC):
 
     Implementations of this class receive notifications when quiz events
     occur and define how those events should be handled.
+
+    Attributes:
+         label_names: Optional list of names used to label answer
+                options (e.g. ["Green", "Red", "Yellow"]).
     """
+
+    def __init__(self, label_names: list[str] | None = None, **kwargs):
+        """Initialize the quiz listener."""
+        super().__init__(**kwargs)
+        self.label_names = label_names
+
+    def set_answer_labels(self, label_names: list[str]):
+        """Optional list of names used to label answer
+
+        Args:
+            label_names: Optional list of names used to label answer
+                options (e.g. ["Green", "Red", "Yellow"]).
+        """
+        self.label_names = label_names
 
     @abstractmethod
     def on_event(self, e: QuizEvent, args: Any | None = None) -> None:

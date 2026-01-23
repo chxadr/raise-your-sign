@@ -20,12 +20,13 @@ class QuizController(ABC):
         quiz: The quiz model instance to control.
     """
 
-    def __init__(self, quiz: QuizModel):
+    def __init__(self, quiz: QuizModel, **kwargs):
         """Initialize the quiz controller.
 
         Args:
             quiz: The quiz model instance to control.
         """
+        super().__init__(**kwargs)
         self.quiz = quiz
 
     @abstractmethod

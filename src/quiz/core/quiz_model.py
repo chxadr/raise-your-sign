@@ -31,16 +31,24 @@ class QuizModel(ABC):
         players: Object representing all players participating in the quiz.
     """
 
-    def __init__(self, players: Any):
-        """Initialize the quiz model.
-
-        Args:
-            players: Object representing all players participating
-                in the quiz.
-        """
+    def __init__(self, **kwargs):
+        """Initialize the quiz model."""
+        super().__init__(**kwargs)
         self.listeners: list[QuizListener] = []
         self.quiz_file: Any | None = None
         self.output_file: Any | None = None
+        self.players: Any | None = None
+
+    def requires_players(self):
+        if self.players is None:
+            raise RuntimeError("QuizModel.players must be set before use")
+
+    def set_players(self, players: Any):
+        """Set players for the quiz.
+
+        Args:
+            players: Players for the quiz.
+        """
         self.players = players
 
     def notify_listeners(self, e: QuizEvent,

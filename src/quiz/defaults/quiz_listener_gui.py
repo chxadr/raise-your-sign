@@ -15,6 +15,8 @@ import sys
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
+import sv_ttk
+import darkdetect
 
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -77,6 +79,7 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
         self.player_frame = ttk.Frame(self)
         self.player_label = ttk.Label(self.player_frame)
         self.player_label.pack(side="left", fill="y")
+        sv_ttk.set_theme(darkdetect.theme())
 
     def build_question_string(self, args: list[str]) -> None:
         """Format the current question and its options for display.

@@ -7,7 +7,9 @@ dependencies = [
     "matplotlib>=3.10",
     "tabulate>=0.9",
     "plotext>=5.3",
-    "nava>=0.6"
+    "nava>=0.6",
+    "sv-ttk>=2.6.1",
+    "darkdetect>=0.8.0"
 ]
 requires-python = ">= 3.13"
 authors = [
@@ -30,8 +32,7 @@ classifiers = [
 
 [project.optional-dependencies]
 dev = [
-    "pyinstaller",
-    "py2exe"
+    "pyinstaller"
 ]
 
 [project.urls]

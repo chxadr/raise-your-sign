@@ -11,7 +11,6 @@ from typing import Any, override
 import tkinter as tk
 from tkinter import ttk
 from tkinter import filedialog as fd
-from tkinter import simpledialog
 
 from PIL import Image, ImageTk
 
@@ -72,7 +71,7 @@ class QuizControllerCVGUI(QuizController):
         self.cap: Any | None = None
         self.selected_index = tk.IntVar(value=-1)
 
-        self.camera_frame = ttk.Frame(view)
+        self.camera_frame = ttk.Frame(view, padding=20)
 
         self.video_label = ttk.Label(self.camera_frame)
         self.video_label.pack()

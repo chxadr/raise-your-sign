@@ -90,7 +90,8 @@ class ColorDetectionConfig:
     )
     red2: ColorRange = ColorRange(
         # np.array([170, 170, 100]), np.array([180, 255, 255])
-        np.array([175, 170, 100]), np.array([180, 255, 255])
+        # np.array([175, 170, 100]), np.array([180, 255, 255])
+        np.array([175, 70, 100]), np.array([179, 255, 255])
     )
     yellow: ColorRange = ColorRange(
         # np.array([15, 150, 150]), np.array([32, 255, 255])
@@ -99,7 +100,8 @@ class ColorDetectionConfig:
     )
     green: ColorRange = ColorRange(
         # np.array([40, 100, 50]), np.array([80, 255, 255])
-        np.array([40, 100, 50]), np.array([80, 255, 255])
+        # np.array([40, 100, 50]), np.array([80, 255, 255])
+        np.array([40, 45, 50]), np.array([80, 255, 255])
     )
     blue: ColorRange = ColorRange(
         # np.array([100, 180, 60]), np.array([130, 255, 255])

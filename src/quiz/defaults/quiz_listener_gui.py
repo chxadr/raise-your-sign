@@ -137,7 +137,10 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
 
         self.plot_window = tk.Toplevel(self)
         self.plot_window.title("Quiz Results")
-        fig, axs = plt.subplots(3, 1, figsize=(1, 12), dpi=100)
+
+        fig, axs = plt.subplots(
+            3, 1, figsize=(36, 12), dpi=100, constrained_layout=True
+        )
         self.canvas = FigureCanvasTkAgg(fig, master=self.plot_window)
 
         axs[0].barh(scores.index, scores.values)

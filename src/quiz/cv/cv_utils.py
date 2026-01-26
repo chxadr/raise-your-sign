@@ -85,14 +85,16 @@ class ColorDetectionConfig:
     # HSV color ranges
     red1: ColorRange = ColorRange(
         # np.array([0, 170, 100]), np.array([10, 255, 255])
-        np.array([0, 170, 100]), np.array([6, 255, 255])
+        # np.array([0, 170, 100]), np.array([6, 255, 255])
+        np.array([0, 120, 100]), np.array([7, 255, 255])
     )
     red2: ColorRange = ColorRange(
         # np.array([170, 170, 100]), np.array([180, 255, 255])
-        np.array([170, 170, 100]), np.array([180, 255, 255])
+        np.array([175, 170, 100]), np.array([180, 255, 255])
     )
     yellow: ColorRange = ColorRange(
         # np.array([15, 150, 150]), np.array([32, 255, 255])
+        # np.array([12, 90, 70]), np.array([30, 255, 255])
         np.array([12, 90, 70]), np.array([30, 255, 255])
     )
     green: ColorRange = ColorRange(
@@ -102,12 +104,14 @@ class ColorDetectionConfig:
     blue: ColorRange = ColorRange(
         # np.array([100, 180, 60]), np.array([130, 255, 255])
         # np.array([100, 180, 50]), np.array([140, 255, 255])
-        np.array([95, 150, 125]), np.array([115, 255, 255])
+        # np.array([95, 150, 125]), np.array([115, 255, 255])
+        np.array([95, 80, 100]), np.array([115, 255, 255])
     )
     magenta: ColorRange = ColorRange(
         # np.array([145, 150, 100]), np.array([170, 255, 255])
         # np.array([145, 150, 120]), np.array([165, 255, 255])
-        np.array([150, 135, 120]), np.array([170, 255, 255])
+        # np.array([150, 135, 120]), np.array([165, 255, 255])
+        np.array([150, 100, 120]), np.array([170, 255, 255])
     )
 
     # Pixel area validation

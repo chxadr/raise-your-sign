@@ -325,10 +325,8 @@ class QuizControllerCVGUI(QuizController):
                     if detected_index is not None:
                         # A sign with a valid color is detected.
                         # Show information on screen.
-                        answer = self.quiz.get_options()[detected_index]
                         color_name = color_detectors[detected_index][0]
-                        text = f"{color_name}: {answer}"
-                        self.draw_answer_text(frame, text)
+                        self.draw_answer_text(frame, color_name)
 
                         if hold_timer.running() and not validated:
                             self.draw_progress_bar(

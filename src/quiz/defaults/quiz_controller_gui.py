@@ -66,7 +66,7 @@ class QuizControllerGUI(QuizController):
         #    independent from `QuizEvent` states.
         self.current_state = QuizEvent.BEGIN
 
-        self.next_btn.pack(side="right", fill="y")
+        self.next_btn.pack(side="right", fill="x")
         self.interactive_frame.pack(side="bottom", fill="x")
 
     def create_radio_buttons(self) -> None:
@@ -92,7 +92,7 @@ class QuizControllerGUI(QuizController):
                     value=i,
                     variable=self.selected_index
                 )
-                btn.pack(side="left", padx=6)
+                btn.pack(side="top", anchor="w")
                 self.radio_btns.append(btn)
 
     def select_file(self) -> str:

@@ -150,7 +150,13 @@ class QuizListenerGUI(ttk.Frame, QuizListener):
         axs[1].set_title("Accuracy (%)")
         axs[1].set_xlim(0, 100)
 
-        axs[2].barh(question_score.index, question_score.values)
+        question_score = question_score.sort_index()
+        question_map = {
+            f"Q{i+1}": question
+            for i, question in enumerate(question_score.index)
+        }
+        labels = list(question_map.keys())
+        axs[2].barh(labels, question_score.values)
         axs[2].set_title("Correct Answer per Question")
 
         for ax in axs:

@@ -1,6 +1,6 @@
 # Raise Your Sign
 
-An interactive quiz program that allows users to respond to questions by raising signs. 
+An interactive quiz program where users can vote by raising signs. 
 
 ## Installing and testing the project
 
